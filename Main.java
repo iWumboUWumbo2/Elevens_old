@@ -29,10 +29,20 @@ public class Main extends JFrame {
         hint.addActionListener(new ActionListener() {
         	public void actionPerformed (ActionEvent e) {
         		cbg.highlightHint();
+        		new AudioPlayer("audio/hint.wav");
         	}
         });
-        
         menu.add(hint);
+        
+        menu.add(new JSeparator());
+        JMenuItem appearance = new JMenuItem("Change Appearance");
+        appearance.addActionListener(new ActionListener() {
+        	public void actionPerformed (ActionEvent e) {
+        		new AppearanceChanger();
+        	}
+        });
+        menu.add(appearance);
+        
         menuBar.add(menu);
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(new JLabel("Score: "));
@@ -62,17 +72,33 @@ public class Main extends JFrame {
                     	cbg.deselectAll();
                     	score.setText(++elevenCount + "");
                     	cardsRemaining.setText(deck.size() + "");
+                    	new AudioPlayer("audio/cardsclear.wav");
                 	}
 
-                	if (deck.size() < 2)
+                	if (deck.size() < 2) {
+                    	setToCardBack(null);
+                    	new AudioPlayer("audio/win.wav");
                     	JOptionPane.showMessageDialog(panel, "You Win!");
+                	}
 
-                	if (cbg.isGameOver())
-                    	JOptionPane.showMessageDialog(panel, "Game Over!"); 
+                	if (cbg.isGameOver()) {
+                		setToCardBack(null);
+                		new AudioPlayer("audio/loss.wav");
+                    	JOptionPane.showMessageDialog(panel, "Game Over!");                    	
+                	}
         		}
             });
             panel.add(cbg.get(i));
         }
+    }
+    
+    public void setToCardBack(String color) {
+    	Iterator it = cbg.getCardButtons().iterator();
+    	
+    	while (it.hasNext()) {
+    		CardButton cb = (CardButton) it.next();
+        	cb.cardBack(color);
+    	}
     }
 
     public Main() {
@@ -81,6 +107,7 @@ public class Main extends JFrame {
         deck = new Deck();
         deck.shuffleDeck();
         cbg = new CardButtonGroup();
+        new AudioPlayer("audio/begin.wav");
         setPlayField();
 
         setMenu();
